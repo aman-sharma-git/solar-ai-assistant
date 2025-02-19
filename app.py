@@ -1,11 +1,18 @@
+import os
 import streamlit as st
 import google.generativeai as genai
-import os
 from dotenv import load_dotenv
 
 # Load API Key from .env file
 load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
+
+if not API_KEY:
+    st.error("⚠️ ERROR: GEMINI_API_KEY is not set in .env!")
+    st.stop()
+
+# Configure Google Gemini AI
+genai.configure(api_key=API_KEY)
 
 # AI Behavior Prompt
 SYSTEM_PROMPT = """You are a Solar Industry Expert AI Assistant. Provide accurate information about:
@@ -37,24 +44,25 @@ def call_gemini(user_input, history):
         return f"⚠️ Google Gemini API Error: {str(e)}"
 
 # Streamlit UI
-st.title("🤖 AI Chatbot - Powered by Google Gemini")
+st.title("☀️ Solar Industry AI Assistant")
 
-# User input
-user_input = st.text_area("Enter your message:", "")
+# Initialize chat history
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
 
-if st.button("Generate Response"):
-    if user_input:
-        try:
-            # Correct message format for Gemini API
-            response = model.generate_content([
-                {"role": "user", "parts": [{"text": user_input}]}
-            ])
-            
-            # Display the AI response
-            st.subheader("🤖 AI Response:")
-            st.write(response.text)
-        
-        except Exception as e:
-            st.error(f"⚠️ Error: {str(e)}")
-    else:
-        st.warning("⚠️ Please enter a message first.")
+# Display chat history
+for user_msg, assistant_msg in st.session_state.chat_history:
+    st.chat_message("user").write(user_msg)
+    st.chat_message("assistant").write(assistant_msg)
+
+# User Input
+user_input = st.text_input("Ask about solar energy...", key="user_input")
+if st.button("Submit") and user_input:
+    response = call_gemini(user_input, st.session_state.chat_history)
+    st.session_state.chat_history.append((user_input, response))
+    st.rerun()
+
+# Clear chat button
+if st.button("Clear Chat"):
+    st.session_state.chat_history = []
+    st.rerun()
