@@ -84,8 +84,8 @@ with col2:
     if st.button("Check History"):
         st.subheader("🔍 Previous Chat History")
         if st.session_state.chat_history:
-            for i, (user_msg, model_msg) in enumerate(st.session_state.chat_history):
-                with st.expander(f"Chat {i+1}"):
+            for user_msg, model_msg in st.session_state.chat_history:
+                with st.expander(f"📌 {user_msg[:50]}..."):  # Show user question as title (first 50 chars)
                     st.write(f"**You:** {user_msg}")
                     st.write(f"**AI:** {model_msg}")
         else:
