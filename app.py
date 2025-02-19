@@ -15,7 +15,7 @@ if not API_KEY:
 # Configure Google Gemini AI
 genai.configure(api_key=API_KEY)
 
-# AI Behavior Prompt (Added to User's First Message Instead of a System Role)
+# AI Behavior Prompt (Added in First User Message Instead of a System Role)
 AI_INSTRUCTIONS = """You are a Solar Industry Expert AI Assistant. 
 Provide accurate and professional information about:
 - Solar Panel Technology
@@ -36,10 +36,9 @@ def call_gemini(user_input, history):
         messages.append({"role": "user", "parts": [{"text": AI_INSTRUCTIONS}]})
 
     # Append previous chat history
-    if isinstance(history, list) and all(isinstance(msg, tuple) and len(msg) == 2 for msg in history):
-        for user_msg, model_msg in history:
-            messages.append({"role": "user", "parts": [{"text": user_msg}]})
-            messages.append({"role": "model", "parts": [{"text": model_msg}]})  # Fixed "assistant" -> "model"
+    for user_msg, model_msg in history:
+        messages.append({"role": "user", "parts": [{"text": user_msg}]})
+        messages.append({"role": "model", "parts": [{"text": model_msg}]})  # "assistant" -> "model"
 
     # Add new user message
     messages.append({"role": "user", "parts": [{"text": user_input}]})
@@ -54,7 +53,7 @@ def call_gemini(user_input, history):
 # Streamlit UI
 st.title("☀️ Solar Industry AI Assistant")
 
-# Initialize chat history
+# Initialize chat history in session state
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
@@ -71,4 +70,9 @@ user_input = st.chat_input("Ask about solar energy...")
 if user_input:
     response = call_gemini(user_input, st.session_state.chat_history)
     st.session_state.chat_history.append((user_input, response))
-    st.rerun()  # Refresh the UI to display new
+    st.rerun()  # Refresh UI
+
+# Clear chat button
+if st.button("Clear Chat"):
+    st.session_state.chat_history = []
+    st.rerun()
