@@ -15,8 +15,9 @@ if not API_KEY:
 # Configure Google Gemini AI
 genai.configure(api_key=API_KEY)
 
-# AI Behavior Prompt
-SYSTEM_PROMPT = """You are a Solar Industry Expert AI Assistant. Provide accurate information about:
+# AI Behavior Prompt (Added to User's First Message Instead of a System Role)
+AI_INSTRUCTIONS = """You are a Solar Industry Expert AI Assistant. 
+Provide accurate and professional information about:
 - Solar Panel Technology
 - Installation Processes
 - Maintenance Requirements
@@ -24,19 +25,24 @@ SYSTEM_PROMPT = """You are a Solar Industry Expert AI Assistant. Provide accurat
 - Industry Regulations
 - Market Trends
 
-Tailor responses to the user's technical level. Be professional and polite. Decline non-solar questions."""
+Tailor responses based on the user's technical level. Decline non-solar-related questions politely."""
 
 # Function to Call Google Gemini AI
 def call_gemini(user_input, history):
-    messages = [{"role": "system", "parts": [{"text": SYSTEM_PROMPT}]}]  # Fix API structure
+    messages = []  # Gemini only supports "user" and "model" roles
+
+    # Add AI instructions only once at the start of conversation
+    if not history:
+        messages.append({"role": "user", "parts": [{"text": AI_INSTRUCTIONS}]})
 
     # Append previous chat history
     if isinstance(history, list) and all(isinstance(msg, tuple) and len(msg) == 2 for msg in history):
-        for user_msg, assistant_msg in history:
+        for user_msg, model_msg in history:
             messages.append({"role": "user", "parts": [{"text": user_msg}]})
-            messages.append({"role": "assistant", "parts": [{"text": assistant_msg}]})
+            messages.append({"role": "model", "parts": [{"text": model_msg}]})  # Fixed "assistant" -> "model"
 
-    messages.append({"role": "user", "parts": [{"text": user_input}]})  # Fix input format
+    # Add new user message
+    messages.append({"role": "user", "parts": [{"text": user_input}]})
 
     try:
         model = genai.GenerativeModel("gemini-pro")
@@ -53,11 +59,11 @@ if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
 # Display chat history using Streamlit's chat elements
-for user_msg, assistant_msg in st.session_state.chat_history:
+for user_msg, model_msg in st.session_state.chat_history:
     with st.chat_message("user"):
         st.write(user_msg)
-    with st.chat_message("assistant"):
-        st.write(assistant_msg)
+    with st.chat_message("model"):  # Fixed "assistant" -> "model"
+        st.write(model_msg)
 
 # User Input Box
 user_input = st.chat_input("Ask about solar energy...")
@@ -65,9 +71,4 @@ user_input = st.chat_input("Ask about solar energy...")
 if user_input:
     response = call_gemini(user_input, st.session_state.chat_history)
     st.session_state.chat_history.append((user_input, response))
-    st.rerun()  # Refresh the UI to display new messages
-
-# Clear chat button
-if st.button("Clear Chat"):
-    st.session_state.chat_history = []
-    st.rerun()
+    st.rerun()  # Refresh the UI to display new
