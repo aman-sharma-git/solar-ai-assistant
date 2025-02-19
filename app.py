@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
 
+# Check if API key is set
 if not API_KEY:
     st.error("⚠️ ERROR: GEMINI_API_KEY is not set in .env!")
     st.stop()
@@ -27,14 +28,15 @@ Tailor responses to the user's technical level. Be professional and polite. Decl
 
 # Function to Call Google Gemini AI
 def call_gemini(user_input, history):
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    messages = [{"role": "system", "parts": [{"text": SYSTEM_PROMPT}]}]  # Fix API structure
 
+    # Append previous chat history
     if isinstance(history, list) and all(isinstance(msg, tuple) and len(msg) == 2 for msg in history):
         for user_msg, assistant_msg in history:
-            messages.append({"role": "user", "content": user_msg})
-            messages.append({"role": "assistant", "content": assistant_msg})
+            messages.append({"role": "user", "parts": [{"text": user_msg}]})
+            messages.append({"role": "assistant", "parts": [{"text": assistant_msg}]})
 
-    messages.append({"role": "user", "content": user_input})
+    messages.append({"role": "user", "parts": [{"text": user_input}]})  # Fix input format
 
     try:
         model = genai.GenerativeModel("gemini-pro")
@@ -50,17 +52,20 @@ st.title("☀️ Solar Industry AI Assistant")
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
-# Display chat history
+# Display chat history using Streamlit's chat elements
 for user_msg, assistant_msg in st.session_state.chat_history:
-    st.chat_message("user").write(user_msg)
-    st.chat_message("assistant").write(assistant_msg)
+    with st.chat_message("user"):
+        st.write(user_msg)
+    with st.chat_message("assistant"):
+        st.write(assistant_msg)
 
-# User Input
-user_input = st.text_input("Ask about solar energy...", key="user_input")
-if st.button("Submit") and user_input:
+# User Input Box
+user_input = st.chat_input("Ask about solar energy...")
+
+if user_input:
     response = call_gemini(user_input, st.session_state.chat_history)
     st.session_state.chat_history.append((user_input, response))
-    st.rerun()
+    st.rerun()  # Refresh the UI to display new messages
 
 # Clear chat button
 if st.button("Clear Chat"):
