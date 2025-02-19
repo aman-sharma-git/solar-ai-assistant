@@ -72,7 +72,21 @@ if user_input:
     st.session_state.chat_history.append((user_input, response))
     st.rerun()  # Refresh UI
 
-# Clear chat button
-if st.button("Clear Chat"):
-    st.session_state.chat_history = []
-    st.rerun()
+# Buttons Section
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.button("Clear Chat"):
+        st.session_state.chat_history = []
+        st.rerun()
+
+with col2:
+    if st.button("Check History"):
+        st.subheader("🔍 Previous Chat History")
+        if st.session_state.chat_history:
+            for i, (user_msg, model_msg) in enumerate(st.session_state.chat_history):
+                with st.expander(f"Chat {i+1}"):
+                    st.write(f"**You:** {user_msg}")
+                    st.write(f"**AI:** {model_msg}")
+        else:
+            st.info("No previous chat history available.")
