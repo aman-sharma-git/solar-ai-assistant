@@ -32,10 +32,23 @@ SOLAR_KEYWORDS = ["solar", "photovoltaic", "pv", "renewable energy", "sun",
                   "solar panel", "net metering", "solar cell", "solar inverter", 
                   "solar energy", "solar power", "solar battery"]
 
+# Words that need context (like "it", "this", "that")
+VAGUE_WORDS = ["it", "this", "that", "they", "them", "these", "those"]
+
 # Function to Check if Question is Solar-Related
-def is_solar_related(user_input):
-    user_input = user_input.lower()  # Convert input to lowercase
-    return any(keyword in user_input for keyword in SOLAR_KEYWORDS)  # Check if any solar keyword exists
+def is_solar_related(user_input, history):
+    user_input = user_input.lower()
+
+    # Check if the input contains solar-related words
+    if any(keyword in user_input for keyword in SOLAR_KEYWORDS):
+        return True
+
+    # If input contains vague words and the last message was about solar, assume it's about solar
+    if any(word in user_input.split() for word in VAGUE_WORDS):
+        if history and any(is_solar_related(msg[0], []) for msg in history[-1:]):  # Check the last message
+            return True
+
+    return False
 
 # Function to Call Google Gemini AI
 def call_gemini(user_input, history):
@@ -78,7 +91,7 @@ for user_msg, model_msg in st.session_state.chat_history:
 user_input = st.chat_input("Ask about solar technology...")
 
 if user_input:
-    if is_solar_related(user_input):
+    if is_solar_related(user_input, st.session_state.chat_history):
         response = call_gemini(user_input, st.session_state.chat_history)
     else:
         response = "⚠️ Sorry, I can only answer questions related to solar energy."
