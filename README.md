@@ -1,64 +1,134 @@
-# Solar Industry AI Chatbot
+# ☀️ Solar Industry AI Assistant
 
-## Overview
-This is a Streamlit-based AI chatbot powered by Google Gemini API. It provides expert knowledge on solar energy, including solar panel technology, installation, maintenance, costs, regulations, and market trends.
+## 🌍[App Link](https://solar-ai-assistant-ekpyo5.streamlit.app/)
 
-## Features
-- **Expert AI Assistance**: Get accurate and detailed responses related to solar energy.
-- **Chat History**: View and retain previous conversations.
-- **Clear Chat**: Reset the conversation easily.
-- **Restricted Queries**: Only allows solar-related questions.
-- **Streamlit UI**: Interactive and user-friendly web interface.
+This project is a **Solar Industry AI Assistant** built using **Streamlit** and **Google Gemini AI**. It provides users with accurate and professional information about solar energy.
 
-## Installation
-### Prerequisites
-- Python 3.8+
-- A Google Gemini API Key
+---
 
-### Setup
-1. **Clone the repository**
-   ```sh
-   git clone https://github.com/aman-sharma-git/solar-ai-chatbot.git
-   cd solar-ai-chatbot
-   ```
+## 📂 Project Structure
 
-2. **Create a virtual environment**
-   ```sh
-   python -m venv venv
-   source venv/bin/activate  # On Windows use: venv\Scripts\activate
-   ```
+- **`.env`** – Stores the API key for Google Gemini AI.
+- **`app.py`** – The main Python script that runs the Streamlit application.
+- **`requirements.txt`** – Lists the dependencies required to run the project.
 
-3. **Install dependencies**
-   ```sh
-   pip install -r requirements.txt
-   ```
+---
 
-4. **Set up environment variables**
-   - Create a `.env` file in the project root and add:
-     ```
-     GEMINI_API_KEY=your_google_gemini_api_key
-     ```
+## 📥 Installation
 
-5. **Run the chatbot**
-   ```sh
-   streamlit run app.py
-   ```
+### **1️⃣ Install Dependencies**
+Run the following command in **Windows PowerShell** or **Terminal**:
+```bash
+pip install -r requirements.txt
+```
 
-## Deployment
-To deploy on Streamlit Cloud:
-1. Push the code to a GitHub repository.
-2. Connect the repository to Streamlit Cloud.
-3. Configure secrets with your API key.
-4. Deploy and access via the provided URL.
+### **2️⃣ Set Up API Key**
+- Get an **API Key** from [Google Gemini AI](https://ai.google.com/).
+- Add it inside the **`.env`** file:
+  ```plaintext
+  GEMINI_API_KEY="your_api_key_here"
+  ```
+- If this key is missing, the app will show an error and **stop execution**.
 
-## Usage
-1. Open the chatbot in a browser.
-2. Ask any solar-related questions.
-3. View chat history or clear it as needed.
+---
 
-## Troubleshooting
-- **API Key Error**: Ensure the `.env` file is correctly set up.
-- **Chatbot Not Responding**: Restart Streamlit and check logs.
+## 🚀 Running the Application
+Once everything is set up, start the project using:
+```bash
+streamlit run app.py
+```
+This will open the **Solar Industry AI Assistant** in your web browser.
 
+---
 
+## 🛠️ Features & Functionality
+
+### ✅ **AI-Powered Solar Industry Expert**
+The AI provides expert guidance on:
+- 🌞 Solar Panel Technology
+- 🛠️ Installation Processes
+- ⚙️ Maintenance Requirements
+- 💰 Cost & ROI Analysis
+- 📜 Industry Regulations
+- 📈 Market Trends
+
+### ✅ **Solar-Specific Responses**
+The AI will **only** answer solar-related questions. If a user asks about unrelated topics, it politely refuses.
+
+### ✅ **Interactive Web UI (Streamlit)**
+- Users can input questions.
+- Chat history is displayed for reference.
+- Buttons for **clearing chat** and **checking chat history**.
+
+### ✅ **Error Handling**
+- Ensures the **API Key** is set up before execution.
+- Displays a **clear error message** if API calls fail.
+
+---
+
+## 🖥️ Code Overview
+
+### **🔹 Load API Key**
+```python
+from dotenv import load_dotenv
+load_dotenv()
+API_KEY = os.getenv("GEMINI_API_KEY")
+```
+
+### **🔹 Define AI Instructions**
+```python
+AI_INSTRUCTIONS = """You are a Solar Industry Expert AI Assistant. Provide professional information about solar energy."""
+```
+
+### **🔹 Check If Question is Solar-Related**
+```python
+def is_solar_related(user_input, history):
+    SOLAR_KEYWORDS = ["solar", "photovoltaic", "renewable energy", "sun"]
+    return any(keyword in user_input.lower() for keyword in SOLAR_KEYWORDS)
+```
+
+### **🔹 Call Google Gemini AI**
+```python
+def call_gemini(user_input, history):
+    model = genai.GenerativeModel("gemini-pro")
+    response = model.generate_content([{"role": "user", "parts": [{"text": user_input}]}])
+    return response.text
+```
+
+### **🔹 Streamlit Web UI**
+```python
+st.title("☀️ Solar Industry AI Assistant")
+user_input = st.chat_input("Ask about solar technology...")
+```
+
+---
+
+## 🧪 Testing the Application
+Try asking **solar-related** questions like:
+✅ "What are the benefits of solar panels?"
+✅ "How do I install a solar inverter?"
+❌ If you ask **non-solar** questions, the AI will refuse to answer.
+
+---
+
+## 📜 License
+This project is open-source. Feel free to modify and improve it!
+
+---
+
+## 🤝 Contributing
+If you want to contribute:
+1. **Fork** the repository.
+2. Create a **new branch** (`feature-branch`).
+3. **Commit** your changes.
+4. **Push** and submit a **pull request**.
+
+---
+
+## 🔗 Useful Links
+- [Google Gemini API Docs](https://ai.google.com/)
+- [Streamlit Docs](https://docs.streamlit.io/)
+- [GitHub Repository](https://github.com/aman-sharma-git/solar-ai-assistant)
+
+Happy coding! 🚀
 
