@@ -31,19 +31,15 @@ Only answer questions related to solar energy. If a question is not related to s
 SOLAR_KEYWORDS = ["solar", "photovoltaic", "pv", "renewable energy", "sun", "solar panels", "net metering", "solar cells", "solar inverter", "solar energy", "solar power"]
 
 # Function to Check if Question is Solar-Related
-def is_solar_related(user_input):
-    return any(keyword in user_input.lower() for keyword in SOLAR_KEYWORDS)
-
-# Function to Handle Pronouns
-def replace_pronouns(user_input):
-    pronouns = ["it", "this", "that", "they", "them"]
-    words = user_input.split()
-    replaced = False
-    for i, word in enumerate(words):
-        if word.lower() in pronouns:
-            words[i] = "solar energy"
-            replaced = True
-    return " ".join(words), replaced
+def is_solar_related(user_input, history):
+    if any(keyword in user_input.lower() for keyword in SOLAR_KEYWORDS):
+        return True
+    
+    # Check if user has been discussing solar previously
+    if history:
+        return any(is_solar_related(msg[0], []) for msg in history[-3:])  # Check last 3 exchanges
+    
+    return False
 
 # Function to Call Google Gemini AI
 def call_gemini(user_input, history):
@@ -86,8 +82,7 @@ for user_msg, model_msg in st.session_state.chat_history:
 user_input = st.chat_input("Ask about solar energy...")
 
 if user_input:
-    user_input, replaced = replace_pronouns(user_input)  # Replace unclear pronouns with "solar energy"
-    if is_solar_related(user_input) or replaced:
+    if is_solar_related(user_input, st.session_state.chat_history):
         response = call_gemini(user_input, st.session_state.chat_history)
     else:
         response = "⚠️ Sorry, I can only answer questions related to solar energy."
