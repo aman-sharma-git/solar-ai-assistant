@@ -34,6 +34,15 @@ SOLAR_KEYWORDS = ["solar", "photovoltaic", "pv", "renewable energy", "sun", "sol
 def is_solar_related(user_input):
     return any(keyword in user_input.lower() for keyword in SOLAR_KEYWORDS)
 
+# Function to Handle Pronouns
+def replace_pronouns(user_input):
+    pronouns = ["it", "this", "that", "they", "them"]
+    words = user_input.split()
+    for i, word in enumerate(words):
+        if word.lower() in pronouns:
+            words[i] = "solar energy"
+    return " ".join(words)
+
 # Function to Call Google Gemini AI
 def call_gemini(user_input, history):
     messages = []
@@ -75,6 +84,7 @@ for user_msg, model_msg in st.session_state.chat_history:
 user_input = st.chat_input("Ask about solar energy...")
 
 if user_input:
+    user_input = replace_pronouns(user_input)  # Replace unclear pronouns with "solar energy"
     if is_solar_related(user_input):
         response = call_gemini(user_input, st.session_state.chat_history)
     else:
