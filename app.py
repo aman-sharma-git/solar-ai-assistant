@@ -27,7 +27,7 @@ Provide accurate and professional information about:
 
 Only answer questions related to solar energy. If a question is not related to solar, politely refuse to answer."""
 
-# Keywords to detect if a question is solar-related
+# List of Solar-Related Keywords
 SOLAR_KEYWORDS = ["solar", "photovoltaic", "pv", "renewable energy", "sun", 
                   "solar panel", "net metering", "solar cell", "solar inverter", 
                   "solar energy", "solar power", "solar battery"]
@@ -36,13 +36,6 @@ SOLAR_KEYWORDS = ["solar", "photovoltaic", "pv", "renewable energy", "sun",
 def is_solar_related(user_input):
     user_input = user_input.lower()  # Convert input to lowercase
     return any(keyword in user_input for keyword in SOLAR_KEYWORDS)  # Check if any solar keyword exists
-
-    
-    # Check if user has been discussing solar previously
-    if history:
-        return any(is_solar_related(msg[0], []) for msg in history[-3:])  # Check last 3 exchanges
-    
-    return False
 
 # Function to Call Google Gemini AI
 def call_gemini(user_input, history):
@@ -82,10 +75,10 @@ for user_msg, model_msg in st.session_state.chat_history:
         st.write(model_msg)
 
 # User Input
-user_input = st.chat_input("Ask about solar Technology...")
+user_input = st.chat_input("Ask about solar technology...")
 
 if user_input:
-    if is_solar_related(user_input, st.session_state.chat_history):
+    if is_solar_related(user_input):
         response = call_gemini(user_input, st.session_state.chat_history)
     else:
         response = "⚠️ Sorry, I can only answer questions related to solar energy."
