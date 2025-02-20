@@ -79,7 +79,7 @@ for user_msg, model_msg in st.session_state.chat_history:
         st.write(model_msg)
 
 # User Input
-user_input = st.chat_input("Ask about solar energy...")
+user_input = st.chat_input("Ask about solar Technology...")
 
 if user_input:
     if is_solar_related(user_input, st.session_state.chat_history):
