@@ -28,12 +28,15 @@ Provide accurate and professional information about:
 Only answer questions related to solar energy. If a question is not related to solar, politely refuse to answer."""
 
 # Keywords to detect if a question is solar-related
-SOLAR_KEYWORDS = ["solar", "photovoltaic", "pv", "renewable energy", "sun", "solar panels", "net metering", "solar cells", "solar inverter", "solar energy", "solar power"]
+SOLAR_KEYWORDS = ["solar", "photovoltaic", "pv", "renewable energy", "sun", 
+                  "solar panel", "net metering", "solar cell", "solar inverter", 
+                  "solar energy", "solar power", "solar battery"]
 
 # Function to Check if Question is Solar-Related
-def is_solar_related(user_input, history):
-    if any(keyword in user_input.lower() for keyword in SOLAR_KEYWORDS):
-        return True
+def is_solar_related(user_input):
+    user_input = user_input.lower()  # Convert input to lowercase
+    return any(keyword in user_input for keyword in SOLAR_KEYWORDS)  # Check if any solar keyword exists
+
     
     # Check if user has been discussing solar previously
     if history:
