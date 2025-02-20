@@ -33,7 +33,7 @@ SOLAR_KEYWORDS = ["solar", "photovoltaic", "pv", "renewable energy", "sun",
                   "solar energy", "solar power", "solar battery"]
 
 # Words that need context (like "it", "this", "that")
-PRONOUN_WORDS = ["it", "this", "that", "they", "them", "these", "those"]
+RELATED_WORDS = ["it", "this", "that", "they", "them", "these", "those"]
 
 # Function to Check if Question is Solar-Related
 def is_solar_related(user_input, history):
@@ -44,7 +44,7 @@ def is_solar_related(user_input, history):
         return True
 
     # If input contains vague words and the last message was about solar, assume it's about solar
-    if any(word in user_input.split() for word in PRONOUN_WORDS):
+    if any(word in user_input.split() for word in RELATED_WORDS):
         if history and any(is_solar_related(msg[0], []) for msg in history[-1:]):  # Check the last message
             return True
 
