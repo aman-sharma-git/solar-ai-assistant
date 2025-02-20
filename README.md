@@ -28,6 +28,7 @@ pip install -r requirements.txt
   ```plaintext
   GEMINI_API_KEY="your_api_key_here"
   ```
+- **⚠️ Do not share or expose your API key publicly!** 🗝
 - If this key is missing, the app will show an error and **stop execution**.
 
 ---
@@ -131,4 +132,5 @@ If you want to contribute:
 - [GitHub Repository](https://github.com/aman-sharma-git/solar-ai-assistant)
 
 Happy coding! 🚀
+
 
