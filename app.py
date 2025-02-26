@@ -37,41 +37,23 @@ RELATED_WORDS = ["it", "this", "that", "they", "them", "these", "those"]
 
 # Function to Check if Question is Solar-Related
 def is_solar_related(user_input, history):
-    user_input = user_input.lower()
-
-    # Check if the input contains solar-related words
+    user_input = user_input.lower().split()
     if any(keyword in user_input for keyword in SOLAR_KEYWORDS):
         return True
+    return history and any(word in RELATED_WORDS for word in user_input) and is_solar_related(history[-1][0], [])
 
-    # If input contains vague words and the last message was about solar, assume it's about solar
-    if any(word in user_input.split() for word in RELATED_WORDS):
-        if history and any(is_solar_related(msg[0], []) for msg in history[-1:]):  # Check the last message
-            return True
-
-    return False
 
 # Function to Call Google Gemini AI
 def call_gemini(user_input, history):
-    messages = []
-
-    # Add AI instructions only once at the start
-    if not history:
-        messages.append({"role": "user", "parts": [{"text": AI_INSTRUCTIONS}]})
-
-    # Append previous chat history
-    for user_msg, model_msg in history:
-        messages.append({"role": "user", "parts": [{"text": user_msg}]})
-        messages.append({"role": "model", "parts": [{"text": model_msg}]})
-
-    # Add new user message
+    messages = [{"role": "user", "parts": [{"text": AI_INSTRUCTIONS}]}] if not history else []
+    messages += [{"role": "user", "parts": [{"text": msg[0]}]}, {"role": "model", "parts": [{"text": msg[1]}]}] for msg in history
     messages.append({"role": "user", "parts": [{"text": user_input}]})
-
+    
     try:
-        model = genai.GenerativeModel("gemini-1.5-pro")  
-        response = model.generate_content(messages)
-        return response.text
+        return genai.GenerativeModel("gemini-pro").generate_content(messages).text
     except Exception as e:
-        return f"⚠️ Google Gemini API Error: {str(e)}"
+        return f"⚠️ Error: {e}"
+
 
 # Streamlit UI
 st.title("☀️ Solar Industry AI Assistant")
