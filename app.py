@@ -67,7 +67,7 @@ def call_gemini(user_input, history):
     messages.append({"role": "user", "parts": [{"text": user_input}]})
 
     try:
-        model = genai.GenerativeModel("gemini-1.0-pro")
+        model = genai.GenerativeModel("gemini-pro-vision")
         response = model.generate_content(messages)
         return response.text
     except Exception as e:
