@@ -6,7 +6,7 @@ This project is a **Solar Industry AI Assistant** built using **Streamlit** and 
 
 ---
 
-## 📂 Project Structure
+## 📚 Project Structure
 
 - **`.env`** – Stores the API key for Google Gemini AI.
 - **`app.py`** – The main Python script that runs the Streamlit application.
@@ -28,7 +28,7 @@ pip install -r requirements.txt
   ```plaintext
   GEMINI_API_KEY="your_api_key_here"
   ```
-- **⚠️ Do not share or expose your API key publicly!** 🗝
+- **⚠️ Do not share or expose your API key publicly!** 🧑‍🔧
 - If this key is missing, the app will show an error and **stop execution**.
 
 ---
@@ -50,11 +50,16 @@ The AI provides expert guidance on:
 - 🛠️ Installation Processes
 - ⚙️ Maintenance Requirements
 - 💰 Cost & ROI Analysis
-- 📜 Industry Regulations
+- 📝 Industry Regulations
 - 📈 Market Trends
 
 ### ✅ **Solar-Specific Responses**
-The AI will **only** answer solar-related questions. If a user asks about unrelated topics, it politely refuses.
+- The AI will **only** answer solar-related questions.
+- If a user asks about unrelated topics, it politely refuses.
+
+### ✅ **Enhanced Contextual Understanding**
+- Uses **solar-specific keywords** to determine relevance.
+- Recognizes contextual words like **"it"**, **"this"**, **"that"**, ensuring continuity.
 
 ### ✅ **Interactive Web UI (Streamlit)**
 - Users can input questions.
@@ -78,28 +83,67 @@ API_KEY = os.getenv("GEMINI_API_KEY")
 
 ### **🔹 Define AI Instructions**
 ```python
-AI_INSTRUCTIONS = """You are a Solar Industry Expert AI Assistant. Provide professional information about solar energy."""
+AI_INSTRUCTIONS = """You are a Solar Industry Expert AI Assistant.
+Provide accurate and professional information about:
+- Solar Panel Technology
+- Installation Processes
+- Maintenance Requirements
+- Cost & ROI Analysis
+- Industry Regulations
+- Market Trends
+
+Only answer questions related to solar energy. If a question is not related to solar, politely refuse to answer."""
 ```
 
 ### **🔹 Check If Question is Solar-Related**
 ```python
+SOLAR_KEYWORDS = ["solar", "photovoltaic", "pv", "renewable energy", "sun",
+                  "solar panel", "net metering", "solar cell", "solar inverter",
+                  "solar energy", "solar power", "solar battery"]
+
+RELATED_WORDS = ["it", "this", "that", "they", "them", "these", "those"]
+
 def is_solar_related(user_input, history):
-    SOLAR_KEYWORDS = ["solar", "photovoltaic", "renewable energy", "sun"]
-    return any(keyword in user_input.lower() for keyword in SOLAR_KEYWORDS)
+    user_input = user_input.lower().split()
+    if any(keyword in user_input for keyword in SOLAR_KEYWORDS):
+        return True
+    return history and any(word in RELATED_WORDS for word in user_input) and is_solar_related(history[-1][0], [])
 ```
 
 ### **🔹 Call Google Gemini AI**
 ```python
 def call_gemini(user_input, history):
-    model = genai.GenerativeModel("gemini-pro")
-    response = model.generate_content([{"role": "user", "parts": [{"text": user_input}]}])
-    return response.text
+    messages = [{"role": "user", "parts": [{"text": AI_INSTRUCTIONS}]}] if not history else []
+    
+    messages.extend(
+        [{"role": "user", "parts": [{"text": msg[0]}]}, {"role": "model", "parts": [{"text": msg[1]}]}]
+        for msg in history
+    )
+    
+    messages.append({"role": "user", "parts": [{"text": user_input}]})
+    
+    try:
+        model = genai.GenerativeModel("gemini-1.5-pro")
+        response = model.generate_content(messages)
+        return response.text
+    except Exception as e:
+        return f"⚠️ Error: {e}"
 ```
 
 ### **🔹 Streamlit Web UI**
 ```python
 st.title("☀️ Solar Industry AI Assistant")
-user_input = st.chat_input("Ask about solar technology...")
+
+# Initialize chat history
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
+# Display chat history
+for user_msg, model_msg in st.session_state.chat_history:
+    with st.chat_message("user"):
+        st.write(user_msg)
+    with st.chat_message("model"):
+        st.write(model_msg)
 ```
 
 ---
@@ -112,12 +156,7 @@ Try asking **solar-related** questions like:
 
 ---
 
-## 📜 License
-This project is open-source. Feel free to modify and improve it!
-
----
-
-## 🤝 Contributing
+## 🐝 Contributing
 If you want to contribute:
 1. **Fork** the repository.
 2. Create a **new branch** (`feature-branch`).
@@ -126,11 +165,15 @@ If you want to contribute:
 
 ---
 
-## 🔗 Useful Links
+## 📢 License
+This project is open-source. Feel free to modify and improve it!
+
+---
+
+## 💍 Useful Links
 - [Google Gemini API Docs](https://ai.google.com/)
 - [Streamlit Docs](https://docs.streamlit.io/)
 - [GitHub Repository](https://github.com/aman-sharma-git/solar-ai-assistant)
 
 Happy coding! 🚀
-
 
