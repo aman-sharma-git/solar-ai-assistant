@@ -46,13 +46,23 @@ def is_solar_related(user_input, history):
 # Function to Call Google Gemini AI
 def call_gemini(user_input, history):
     messages = [{"role": "user", "parts": [{"text": AI_INSTRUCTIONS}]}] if not history else []
-    messages += [{"role": "user", "parts": [{"text": msg[0]}]}, {"role": "model", "parts": [{"text": msg[1]}]}] for msg in history
+
+    # Append previous chat history
+    messages.extend(
+        [{"role": "user", "parts": [{"text": msg[0]}]}, {"role": "model", "parts": [{"text": msg[1]}]}] 
+        for msg in history
+    )
+
+    # Add new user message
     messages.append({"role": "user", "parts": [{"text": user_input}]})
-    
+
     try:
-        return genai.GenerativeModel("gemini-pro").generate_content(messages).text
+        model = genai.GenerativeModel("gemini-pro")
+        response = model.generate_content(messages)
+        return response.text
     except Exception as e:
         return f"⚠️ Error: {e}"
+
 
 
 # Streamlit UI
