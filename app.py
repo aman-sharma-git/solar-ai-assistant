@@ -58,7 +58,7 @@ def call_gemini(user_input, history):
 
     try:
         model = genai.GenerativeModel("gemini-1.5-pro")
-        response = model.generate_content(messages)
+        response = model.generate_content(contents=messages)
         return response.text
     except Exception as e:
         return f"⚠️ Error: {e}"
