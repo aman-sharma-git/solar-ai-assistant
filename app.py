@@ -47,7 +47,7 @@ def is_solar_related(user_input, history):
 def call_gemini(user_input, history):
     try:
         model = genai.GenerativeModel("gemini-1.5-pro")
-        response = model.generate_content(user_input)  # Pass user_input as plain text
+        response = model.generate_content(user_input) 
         return response.text
     except Exception as e:
         return f"⚠️ Error: {e}"
